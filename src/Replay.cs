@@ -92,7 +92,7 @@ namespace BrawlhallaReplayReader
 		///<exception cref="ReplayChecksumException">Thrown when the calculated checksum does not match the replay's checksum stored in the header.</exception>
 		///<exception cref="InvalidReplayDataException"> thrown when the replay's data is invalid.</exception>
 		///<remarks>
-		///<para>This may not work with replays with a version lower than <c>220</c>.<br/>
+		///<para>This may not work with replays with a version lower than <c>234</c>.<br/>
 		///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 		///</remarks>
 		public Replay(string path, bool ignore_checksum = false)
@@ -119,6 +119,7 @@ namespace BrawlhallaReplayReader
 				}
 			}
 			if (!mb_ignore_checksum && CalculateChecksum() != Checksum) throw new ReplayChecksumException("Calculated checksum does not match the replay's Checksum stored in the header.");
+			// The game checks if LevelID corresponds to a valid map; this is not implemented here.
 			m_data = new([]);
 		}
 
