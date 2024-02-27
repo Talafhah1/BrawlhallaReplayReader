@@ -29,7 +29,7 @@
 			Replay replay;
 			try
 			{
-				replay = new(input, ignore_checks);
+				replay = new(File.Open(input, FileMode.Open, FileAccess.Read), ignore_checks);
 				File.WriteAllText(output, replay.ToJson());
 			}
 			catch (Exception e) { Console.WriteLine("[041m[97m  ERROR  [00m[91m {0}[00m", e.Message); return; }
