@@ -29,10 +29,16 @@ namespace BrawlhallaReplayReader
 		///<value>Version of the replay.</value>
 		public uint Version { get; private set; }
 
-		///<value>First version check of the replay.  Valid replays will have this value equal to <c>Version</c>.</value>
+		///<value>First version check of the replay.</value>
+		///<remarks>Valid replays will have this value equal to <c>Version</c>. This can be ignored by setting <c>mb_ignore_checksum</c> to <c>true</c>.</remarks>
 		public uint VersionCheck1 { get; private set; }
 
-		///<value>Second version check of the replay.  Valid replays will have this value equal to <c>Version</c>.</value>
+		///<value>Second version check of the replay.</value>
+		///<remarks>
+		///<para>In the game's implementation, this value is checked against the game's internal replay version.<br/>
+		///In this implementation, this value is checked against the replay's <c>Version</c>.<br/>
+		///This can be ignored by setting <c>mb_ignore_checksum</c> to <c>true</c>.</para>
+		///</remarks>
 		public uint VersionCheck2 { get; private set; }
 
 		///<value>Playlist ID of the match.</value>
@@ -54,6 +60,10 @@ namespace BrawlhallaReplayReader
 		public ushort HeroCount { get; private set; }
 
 		///<value>Checksum of the replay.</value>
+		///<remarks>
+		///<para>Checksum is calculated using the <c>CalculateChecksum</c> method.<br/>
+		///This can be ignored by setting <c>mb_ignore_checksum</c> to <c>true</c>.</para>
+		///</remarks>
 		public uint Checksum { get; private set; }
 
 		///<value>Entities in the match.</value>
@@ -84,7 +94,7 @@ namespace BrawlhallaReplayReader
 		private readonly Dictionary<int, List<InputType>> m_inputs = [];
 
 		///<summary>Reads and deciphers a replay file.</summary>
-		///<param name="path">Path to the replay file.</param>
+		///<param name="stream">The replay file to read.</param>
 		///<param name="ignore_checksum">If the checksum and two version checks should be ignored and raise an exception if they don't match.</param>
 		///<exception cref="FileNotFoundException">Thrown when the replay file is not found.</exception>
 		///<exception cref="InvalidReplayStateException">Thrown when the replay file is in an invalid state.</exception>
@@ -685,7 +695,7 @@ namespace BrawlhallaReplayReader
 			DodgeDash = (input_state & 0b0000_0100_00_0000) != 0;
 			PickUpThrow = (input_state & 0b0000_1000_00_0000) != 0;
 			switch (input_state & 0b1111_0000_00_0000)
-			{	
+			{
 				case 0b0001_0000000000: { Taunt = 1; break; }
 				case 0b0011_0000000000: { Taunt = 2; break; }
 				case 0b0010_0000000000: { Taunt = 3; break; }
