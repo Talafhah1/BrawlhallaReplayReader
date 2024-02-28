@@ -14,9 +14,9 @@ namespace BrawlhallaReplayReader
 		///<value>The default JSON serializer options.</value>
 		public static readonly JsonSerializerOptions s_json_serializer_options = new() { WriteIndented = true };
 
-		///<summery>Decompresses a buffer using the ZLib compression algorithm.</summery>
+		///<summery>Decompresses a stream using the ZLib compression algorithm.</summery>
 		///<param name="compressed_stream">The compressed stream to decompress.</param>
-		///<returns>The decompressed buffer.</returns>
+		///<returns>The bytes of the decompressed stream.</returns>
 		internal static byte[] DecompressStream(Stream compressed_stream)
 		{
 			using MemoryStream buffer_stream = new();
