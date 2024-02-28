@@ -95,11 +95,10 @@ namespace BrawlhallaReplayReader
 		///<para>This may not work with replays with a version lower than <c>234</c>.<br/>
 		///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 		///</remarks>
-		public Replay(string path, bool ignore_checksum = false)
+		public Replay(Stream stream, bool ignore_checksum = false)
 		{
 			mb_ignore_checksum = ignore_checksum;
-			byte[] compressed_replay = File.ReadAllBytes(path);
-			byte[] decompressed_replay = Utils.DecompressBuffer(compressed_replay);
+			byte[] decompressed_replay = Utils.DecompressStream(stream);
 			for (int i = 0; i < decompressed_replay.Length; i++) decompressed_replay[i] ^= s_xor_key[i % s_xor_key.Length];
 			m_data = new(decompressed_replay);
 			bool end_of_replay = false;
