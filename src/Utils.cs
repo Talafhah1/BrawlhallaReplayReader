@@ -134,6 +134,11 @@ namespace BrawlhallaReplayReader
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
 		internal int ReadInt() => ReadBits(32);
 
+		///<summary>Reads a single unsigned int from the buffer.</summary>
+		///<returns>The unsigned int read from the buffer.</returns>
+		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
+		internal uint ReadUInt() => (uint)ReadInt();
+
 		///<summary>Reads a single char from the buffer.</summary>
 		///<returns>The char read from the buffer.</returns>
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
@@ -201,5 +206,16 @@ namespace BrawlhallaReplayReader
 		public InvalidReplayDataException(string message) : base(message) { }
 
 		public InvalidReplayDataException(string message, Exception inner) : base(message, inner) { }
+	}
+
+	///<summary>Class <c>ReplayPacket8Exception</c> is used to throw an exception when a replay has packet type 8.</summary>
+	///<remarks>Packet type 8 means the end of an invalid replay was reached.</remarks>
+	public class ReplayPacket8Exception : InvalidReplayException
+	{
+		public ReplayPacket8Exception() { }
+
+		public ReplayPacket8Exception(string message) : base(message) { }
+
+		public ReplayPacket8Exception(string message, Exception inner) : base(message, inner) { }
 	}
 }
