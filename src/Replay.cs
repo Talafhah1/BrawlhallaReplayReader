@@ -329,8 +329,8 @@ namespace BrawlhallaReplayReader
 			EmitterID = data.ReadUInt();
 			PlayerThemeID = data.ReadUInt();
 			for (byte i = 0; i < 8; i++) Taunts[i] = data.ReadUInt();
-			WinTauntID = (ushort)data.ReadShort();
-			LoseTauntID = (ushort)data.ReadShort();
+			WinTauntID = data.ReadUShort();
+			LoseTauntID = data.ReadUShort();
 			while (data.ReadBool()) m_taunt_database.Add(data.ReadUInt());
 			AvatarID = (uint)data.ReadShort();
 			Team = data.ReadInt();
@@ -378,8 +378,8 @@ namespace BrawlhallaReplayReader
 			HeroID = data.ReadUInt();
 			CostumeID = data.ReadUInt();
 			StanceIndex = data.ReadUInt();
-			WeaponSkin2 = (ushort)data.ReadShort();
-			WeaponSkin1 = (ushort)data.ReadShort();
+			WeaponSkin2 = data.ReadUShort();
+			WeaponSkin1 = data.ReadUShort();
 		}
 
 		///<summary>Converts the <c>ReplayHeroType</c> to a string.</summary>
