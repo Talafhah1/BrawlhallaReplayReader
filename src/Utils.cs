@@ -129,11 +129,6 @@ namespace BrawlhallaReplayReader
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
 		internal short ReadShort() => (short)ReadBits(16);
 
-		///<summary>Reads a single ushort from the buffer.</summary>
-		///<returns>The ushort read from the buffer.</returns>
-		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
-		internal ushort ReadUShort() => (ushort)ReadBits(16);
-
 		///<summary>Reads a single int from the buffer.</summary>
 		///<returns>The int read from the buffer.</returns>
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
@@ -149,7 +144,7 @@ namespace BrawlhallaReplayReader
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
 		///<exception cref="DecoderFallbackException">Thrown when the string contains invalid characters.</exception>
 		///<remarks>Strings are encoded as a short specifying the length of the string, followed by the string itself.</remarks>
-		internal string ReadString() => Encoding.UTF8.GetString(ReadBytes(ReadUShort()));
+		internal string ReadString() => Encoding.UTF8.GetString(ReadBytes((ushort)ReadShort()));
 
 		///<summary>Reads a single float from the buffer.</summary>
 		///<returns>The float read from the buffer.</returns>
