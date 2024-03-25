@@ -114,7 +114,7 @@ namespace BrawlhallaReplayReader
 			bool end_of_replay = false;
 			while (m_data.RemainingBytes > 0 && !end_of_replay)
 			{
-				byte replay_state = (byte)m_data.ReadBits(4);
+				uint replay_state = (uint)m_data.ReadBits(4);
 				switch (replay_state)
 				{
 					case 1: { ReadInputs(); break; }
@@ -137,14 +137,14 @@ namespace BrawlhallaReplayReader
 		{
 			while (m_data!.ReadBool())
 			{
-				byte entity_id = (byte)m_data.ReadBits(5);
+				uint entity_id = (uint)m_data.ReadBits(5);
 				int input_count = m_data.ReadInt();
-				if (!m_inputs.ContainsKey(entity_id)) m_inputs.Add(entity_id, []);
+				if (!m_inputs.ContainsKey((int)entity_id)) m_inputs.Add((int)entity_id, []);
 				for (int i = 0; i < input_count; i++)
 				{
 					int time_stamp = m_data.ReadInt();
 					ushort input_state = m_data.ReadBool() ? (ushort)m_data.ReadBits(14) : (ushort)0;
-					m_inputs[entity_id].Add(new InputType(time_stamp, input_state));
+					m_inputs[(int)entity_id].Add(new InputType(time_stamp, input_state));
 				}
 			}
 		}
@@ -184,21 +184,22 @@ namespace BrawlhallaReplayReader
 			{
 				while (m_data.ReadBool())
 				{
-					byte entity_id = (byte)m_data.ReadBits(5);
+					uint entity_id = (uint)m_data.ReadBits(5);
 					short result = m_data.ReadShort();
-					m_results[entity_id] = result;
+					m_results[(int)entity_id] = result;
 				}
 			}
 			EndOfMatchFanFareID = (uint)m_data.ReadInt();
 		}
 
 		///<summary>Reads the faces and deaths from the replay.</summary>
+		///<param name="knockout" Whether this face is a knockout.</param>
 		private void ReadFaces(bool knockout)
 		{
 			if (knockout) m_deaths = [];
 			while (m_data!.ReadBool())
 			{
-				byte entity_id = (byte)m_data.ReadBits(5);
+				uint entity_id = (uint)m_data.ReadBits(5);
 				int time_stamp = m_data.ReadInt();
 				if (knockout) m_deaths.Add(new DeathType(time_stamp, entity_id));
 			}
@@ -635,10 +636,10 @@ namespace BrawlhallaReplayReader
 		public int TimeStamp { get; private init; }
 
 		///<value>The ID of the entity that died.</value>
-		public int EntityID { get; private init; }
+		public uint EntityID { get; private init; }
 
 		///<summary>Creates a new instance of <c>DeathType</c>.</summary>
-		internal DeathType(int time_stamp, int entity_id)
+		internal DeathType(int time_stamp, uint entity_id)
 		{
 			TimeStamp = time_stamp;
 			EntityID = entity_id;
