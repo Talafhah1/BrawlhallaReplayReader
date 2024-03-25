@@ -143,11 +143,7 @@ namespace BrawlhallaReplayReader
 				for (int i = 0; i < input_count; i++)
 				{
 					int time_stamp = m_data.ReadInt();
-<<<<<<< HEAD
-					uint input_state = m_data.ReadBool() ? (uint)m_data.ReadBits(14) : (uint)0;
-=======
-					ushort input_state = m_data.ReadBool() ? (ushort)m_data.ReadBits(14) : (ushort)0;
->>>>>>> a9c657b422d6d9930082f2563ee3ae76916f8cf3
+					uint input_state = m_data.ReadBool() ? (uint)m_data.ReadBits(14) : 0;
 					m_inputs[(int)entity_id].Add(new InputType(time_stamp, input_state));
 				}
 			}
