@@ -139,11 +139,6 @@ namespace BrawlhallaReplayReader
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
 		internal int ReadInt() => ReadBits(32);
 
-		///<summary>Reads a single unsigned int from the buffer.</summary>
-		///<returns>The unsigned int read from the buffer.</returns>
-		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
-		internal uint ReadUInt() => (uint)ReadInt();
-
 		///<summary>Reads a single char from the buffer.</summary>
 		///<returns>The char read from the buffer.</returns>
 		///<exception cref="EndOfStreamException">Thrown when the number of bits to read is greater than the number of bits remaining in the buffer.</exception>
