@@ -182,16 +182,6 @@ namespace BrawlhallaReplayReader
 		public ReplayChecksumException(string message, Exception inner) : base(message, inner) { }
 	}
 
-	///<summary>Class <c>ReplayVersionException</c> is used to throw an exception when a replay's version check doesn't match the version stored in the header.</summary>
-	public class ReplayVersionException : InvalidReplayException
-	{
-		public ReplayVersionException() { }
-
-		public ReplayVersionException(string message) : base(message) { }
-
-		public ReplayVersionException(string message, Exception inner) : base(message, inner) { }
-	}
-
 	///<summary>Class <c>InvalidReplayDataException</c> is used to throw an exception when a replay's data is invalid.</summary>
 	///<remarks>For example, when a replay's contains no entities or when each entity has a invalid number of Legends.</remarks>
 	public class InvalidReplayDataException : InvalidReplayException

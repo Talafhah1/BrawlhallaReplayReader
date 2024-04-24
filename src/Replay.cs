@@ -6,7 +6,7 @@ namespace BrawlhallaReplayReader
 {
 	///<summary>Class <c>Replay</c> reads a Brawlhalla replay file.</summary>
 	///<remarks>
-	///<para>This may not work with replays with a version lower than <c>220</c> (game version <c>7.05</c>).<br/>
+	///<para>This will not work with replays with a version lower than <c>236</c> (game version <c>8.07</c>).<br/>
 	///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 	///</remarks>
 	public class Replay
@@ -28,18 +28,6 @@ namespace BrawlhallaReplayReader
 
 		///<value>Version of the replay.</value>
 		public uint Version { get; private set; }
-
-		///<value>First version check of the replay.</value>
-		///<remarks>Valid replays will have this value equal to <c>Version</c>. This can be ignored by setting <c>mb_ignore_checksum</c> to <c>true</c>.</remarks>
-		public uint VersionCheck1 { get; private set; }
-
-		///<value>Second version check of the replay.</value>
-		///<remarks>
-		///<para>In the game's implementation, this value is checked against the game's internal replay version.<br/>
-		///In this implementation, this value is checked against the replay's <c>Version</c>.<br/>
-		///This can be ignored by setting <c>mb_ignore_checksum</c> to <c>true</c>.</para>
-		///</remarks>
-		public uint VersionCheck2 { get; private set; }
 
 		///<value>Playlist ID of the match.</value>
 		public uint PlaylistID { get; private set; }
@@ -75,7 +63,7 @@ namespace BrawlhallaReplayReader
 		///<value>Array used to decipher the replay.</value>
 		private static readonly byte[] s_xor_key = [0x6B, 0x10, 0xDE, 0x3C, 0x44, 0x4B, 0xD1, 0x46, 0xA0, 0x10, 0x52, 0xC1, 0xB2, 0x31, 0xD3, 0x6A, 0xFB, 0xAC, 0x11, 0xDE, 0x06, 0x68, 0x08, 0x78, 0x8C, 0xD5, 0xB3, 0xF9, 0x6A, 0x40, 0xD6, 0x13, 0x0C, 0xAE, 0x9D, 0xC5, 0xD4, 0x6B, 0x54, 0x72, 0xFC, 0x57, 0x5D, 0x1A, 0x06, 0x73, 0xC2, 0x51, 0x4B, 0xB0, 0xC9, 0x8C, 0x78, 0x04, 0x11, 0x7A, 0xEF, 0x74, 0x3E, 0x46, 0x39, 0xA0, 0xC7, 0xA6];
 
-		///<value>If the checksum and two version checks should be ignored and raise an exception if they don't match.</value>
+		///<value>If the checksum should be ignored and raise an exception if it doesn't match.</value>
 		private readonly bool mb_ignore_checksum;
 
 		///<value>Bit stream used to read the replay.</value>
@@ -95,14 +83,13 @@ namespace BrawlhallaReplayReader
 
 		///<summary>Reads and deciphers a replay file.</summary>
 		///<param name="stream">The replay file to read.</param>
-		///<param name="ignore_checksum">If the checksum and two version checks should be ignored and raise an exception if they don't match.</param>
+		///<param name="ignore_checksum">If the checksum should be ignored and raise an exception if it doesn't match.</param>
 		///<exception cref="FileNotFoundException">Thrown when the replay file is not found.</exception>
 		///<exception cref="InvalidReplayStateException">Thrown when the replay file is in an invalid state.</exception>
-		///<exception cref="ReplayVersionException">Thrown when the replay's version doesn't match the version stored in the header.</exception>
 		///<exception cref="ReplayChecksumException">Thrown when the calculated checksum does not match the replay's checksum stored in the header.</exception>
 		///<exception cref="InvalidReplayDataException"> thrown when the replay's data is invalid.</exception>
 		///<remarks>
-		///<para>This will not work with replays with a version lower than <c>235</c>.<br/>
+		///<para>This will not work with replays with a version lower than <c>236</c>.<br/>
 		///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 		///</remarks>
 		public Replay(Stream stream, bool ignore_checksum = false)
@@ -111,6 +98,7 @@ namespace BrawlhallaReplayReader
 			byte[] decompressed_replay = Utils.DecompressStream(stream);
 			for (int i = 0; i < decompressed_replay.Length; i++) decompressed_replay[i] ^= s_xor_key[i % s_xor_key.Length];
 			m_data = new(decompressed_replay);
+			Version = (uint)m_data.ReadInt();
 			bool end_of_replay = false;
 			while (m_data.RemainingBytes > 0 && !end_of_replay)
 			{
@@ -153,7 +141,6 @@ namespace BrawlhallaReplayReader
 		private void ReadHeader()
 		{
 			RandomSeed = m_data!.ReadInt();
-			Version = (uint)m_data.ReadInt();
 			PlaylistID = (uint)m_data.ReadInt();
 			if (PlaylistID != 0) PlaylistName = m_data.ReadString();
 			OnlineGame = m_data.ReadBool();
@@ -161,7 +148,6 @@ namespace BrawlhallaReplayReader
 
 		///<summary>Reads the player data from the replay.</summary>
 		///<exception cref="InvalidReplayDataException"> Thrown when the replay's data is invalid.</exception>
-		///<exception cref="ReplayVersionException">Thrown when the replay's version doesn't match the version stored in the header.</exception>
 		private void ReadPlayerData()
 		{
 			GameSettings = new GameSettingsType(m_data!);
@@ -170,16 +156,13 @@ namespace BrawlhallaReplayReader
 			if (HeroCount == 0 || HeroCount > 5) throw new InvalidReplayDataException("Invalid HeroCount; must be between 1 and 5.");
 			while (m_data.ReadBool()) m_entities.Add(new EntityType(m_data.ReadInt(), m_data.ReadString(), new PlayerType(m_data, HeroCount)));
 			if (m_entities.Count == 0) throw new InvalidReplayDataException("No entities found in the replay.");
-			if ((VersionCheck1 = (uint)m_data.ReadInt()) != Version && !mb_ignore_checksum) throw new ReplayVersionException("First version check does not match the replay's Version stored in the header.");
 			Checksum = (uint)m_data.ReadInt();
 		}
 
 		///<summary>Reads the results from the replay.</summary>
-		///<exception cref="ReplayVersionException">Thrown when the replay's version doesn't match the version stored in the header.</exception>
 		private void ReadResults()
 		{
 			Length = (uint)m_data!.ReadInt();
-			if ((VersionCheck2 = (uint)m_data.ReadInt()) != Version && !mb_ignore_checksum) throw new ReplayVersionException("Second version check does not match the replay's Version stored in the header.");
 			if (m_data.ReadBool())
 			{
 				while (m_data.ReadBool())
@@ -254,7 +237,7 @@ namespace BrawlhallaReplayReader
 		///<remarks>
 		///<para>Only the header and results are included in the string representation.</para>
 		///</remarks>
-		public override string ToString() => $"Replay {{ Length: {Length}, EndOfMatchFanFareID: {EndOfMatchFanFareID}, Results: [{string.Join(", ", Results)}], Deaths: [{string.Join(", ", Deaths)}], RandomSeed: {RandomSeed}, Version: {Version}, VersionCheck1: {VersionCheck1}, VersionCheck2: {VersionCheck2}, PlaylistID: {PlaylistID}, PlaylistName: {PlaylistName}, OnlineGame: {OnlineGame}, GameSettings: {GameSettings}, LevelID: {LevelID}, HeroCount: {HeroCount}, Checksum: {Checksum}, Entities: [{string.Join(", ", Entities)}], Inputs: [{string.Join(", ", Inputs)}] }}";
+		public override string ToString() => $"Replay {{ Length: {Length}, EndOfMatchFanFareID: {EndOfMatchFanFareID}, Results: [{string.Join(", ", Results)}], Deaths: [{string.Join(", ", Deaths)}], RandomSeed: {RandomSeed}, Version: {Version}, PlaylistID: {PlaylistID}, PlaylistName: {PlaylistName}, OnlineGame: {OnlineGame}, GameSettings: {GameSettings}, LevelID: {LevelID}, HeroCount: {HeroCount}, Checksum: {Checksum}, Entities: [{string.Join(", ", Entities)}], Inputs: [{string.Join(", ", Inputs)}] }}";
 
 		///<summary>Converts the <c>Replay</c> to a JSON string.</summary>
 		///<returns>JSON string representation of the <c>Replay</c>.</returns>
@@ -434,11 +417,6 @@ namespace BrawlhallaReplayReader
 		///<value>The spawn rate rule ID for Gadgets</value>
 		public uint GadgetSpawnRateID { get; private init; }
 
-		///<value>Unknown field.</value>
-		///<remarks>This field was added in 8.06 along with the new Item Spawn Rules and Rates.</remarks>
-		///<remarks>Currently, this value is hardcoded to <c>0</c></remarks>
-		public uint Unknown { get; private init; }
-
 		///<value>Gadgets & Weapons setting.</value>
 		///<remarks>A value of <c>0</c> means all Gadgets and Weapon Crates are enabled.</remarks>
 		///<remarks>A value of <c>1</c> means custom Gadgets and Weapon Crates are enabled.</remarks>
@@ -465,14 +443,13 @@ namespace BrawlhallaReplayReader
 			ItemSpawnRuleSetID = (uint)data.ReadInt();
 			WeaponSpawnRateID = (uint)data.ReadInt();
 			GadgetSpawnRateID = (uint)data.ReadInt();
-			Unknown = (uint)data.ReadInt();
 			GadgetSelection = (GadgetSelectType)data.ReadInt();
 			CustomGadgetsField = new((uint)data.ReadInt());
 		}
 
 		///<summary>Converts the <c>GameSettingsType</c> to a string.</summary>
 		///<returns>String representation of the <c>GameSettingsType</c>.</returns>
-		public override string ToString() => $"GameSettingsType: Flags={Flags}, MaxPlayers={MaxPlayers}, Duration={Duration}, RoundDuration={RoundDuration}, StartingLives={StartingLives}, ScoringTypeID={ScoringTypeID}, ScoreToWin={ScoreToWin}, GameSpeed={GameSpeed}, DamageMultiplier={DamageMultiplier}, LevelSetID={LevelSetID}, ItemSpawnRuleSetID={ItemSpawnRuleSetID}, WeaponSpawnRateID={WeaponSpawnRateID}, GadgetSpawnRateID={GadgetSpawnRateID}, Unknown={Unknown}, GadgetSelection={GadgetSelection}, CustomGadgetsField={CustomGadgetsField}";
+		public override string ToString() => $"GameSettingsType: Flags={Flags}, MaxPlayers={MaxPlayers}, Duration={Duration}, RoundDuration={RoundDuration}, StartingLives={StartingLives}, ScoringTypeID={ScoringTypeID}, ScoreToWin={ScoreToWin}, GameSpeed={GameSpeed}, DamageMultiplier={DamageMultiplier}, LevelSetID={LevelSetID}, ItemSpawnRuleSetID={ItemSpawnRuleSetID}, WeaponSpawnRateID={WeaponSpawnRateID}, GadgetSpawnRateID={GadgetSpawnRateID}, GadgetSelection={GadgetSelection}, CustomGadgetsField={CustomGadgetsField}";
 
 		///<summary>Converts the <c>GameSettingsType</c> to a JSON string.</summary>
 		///<returns>JSON string representation of the <c>GameSettingsType</c>.</returns>
