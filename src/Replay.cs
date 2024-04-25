@@ -417,15 +417,11 @@ namespace BrawlhallaReplayReader
 		///<value>The spawn rate rule ID for Gadgets</value>
 		public uint GadgetSpawnRateID { get; private init; }
 
-		///<value>Gadgets & Weapons setting.</value>
-		///<remarks>A value of <c>0</c> means all Gadgets and Weapon Crates are enabled.</remarks>
-		///<remarks>A value of <c>1</c> means custom Gadgets and Weapon Crates are enabled.</remarks>
-		///<remarks>A value of <c>2</c> means no Gadgets are enabled.</remarks>
-		public GadgetSelectType GadgetSelection { get; private init; }
-
-		///<value>Custom Gadgets field.</value>
-		///<remarks>Only valid when <c>GadgetSelection</c> is set to <c>1</c> (Custom).</remarks>
+		///<value>Custom Gadgets field</value>
 		public CustomGadgetsType CustomGadgetsField { get; private init; }
+
+		///<value>Variation field</value>
+		public uint Variation { get; private init; }
 
 		///<summary>Creates a new instance of <c>GameSettingsType</c>.</summary>
 		internal GameSettingsType(BitStream data)
@@ -443,13 +439,13 @@ namespace BrawlhallaReplayReader
 			ItemSpawnRuleSetID = (uint)data.ReadInt();
 			WeaponSpawnRateID = (uint)data.ReadInt();
 			GadgetSpawnRateID = (uint)data.ReadInt();
-			GadgetSelection = (GadgetSelectType)data.ReadInt();
 			CustomGadgetsField = new((uint)data.ReadInt());
+			Variation = (uint)data.ReadInt();
 		}
 
 		///<summary>Converts the <c>GameSettingsType</c> to a string.</summary>
 		///<returns>String representation of the <c>GameSettingsType</c>.</returns>
-		public override string ToString() => $"GameSettingsType: Flags={Flags}, MaxPlayers={MaxPlayers}, Duration={Duration}, RoundDuration={RoundDuration}, StartingLives={StartingLives}, ScoringTypeID={ScoringTypeID}, ScoreToWin={ScoreToWin}, GameSpeed={GameSpeed}, DamageMultiplier={DamageMultiplier}, LevelSetID={LevelSetID}, ItemSpawnRuleSetID={ItemSpawnRuleSetID}, WeaponSpawnRateID={WeaponSpawnRateID}, GadgetSpawnRateID={GadgetSpawnRateID}, GadgetSelection={GadgetSelection}, CustomGadgetsField={CustomGadgetsField}";
+		public override string ToString() => $"GameSettingsType: Flags={Flags}, MaxPlayers={MaxPlayers}, Duration={Duration}, RoundDuration={RoundDuration}, StartingLives={StartingLives}, ScoringTypeID={ScoringTypeID}, ScoreToWin={ScoreToWin}, GameSpeed={GameSpeed}, DamageMultiplier={DamageMultiplier}, LevelSetID={LevelSetID}, ItemSpawnRuleSetID={ItemSpawnRuleSetID}, WeaponSpawnRateID={WeaponSpawnRateID}, GadgetSpawnRateID={GadgetSpawnRateID}, CustomGadgetsField={CustomGadgetsField}, Variation={Variation}";
 
 		///<summary>Converts the <c>GameSettingsType</c> to a JSON string.</summary>
 		///<returns>JSON string representation of the <c>GameSettingsType</c>.</returns>
@@ -516,19 +512,6 @@ namespace BrawlhallaReplayReader
 		///<summary>Converts the <c>GameModeFlags</c> to a JSON string.</summary>
 		///<returns>JSON string representation of the <c>GameModeFlags</c>.</returns>
 		public string ToJson() => JsonSerializer.Serialize(this, Utils.s_json_serializer_options).Replace("  ", "\t");
-	}
-
-	///<summary>Enum <c>GadgetSelectType</c> represents the different values for the Gadgets & Weapons setting.</summary>
-	public enum GadgetSelectType
-	{
-		///<value>All Gadgets and Weapon Crates.</value>
-		All = 0,
-
-		///<value>Custom.</value>
-		Custom = 1,
-
-		///<value>No Gadgets.</value>
-		NoGadgets = 2
 	}
 
 	///<summary>Struct <c>CustomGadgetsType</c> stores information about custom Gadgets.</summary>
