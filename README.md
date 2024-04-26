@@ -1,5 +1,5 @@
 A basic .replay reader for Brawlhalla.
-Uses the 8.06 replay format (post Item Spawn Rules system, Star Wars patch).
+Uses the 8.07 replay format (post GameModeManager update).
 
 ## Usage
 ```sh
