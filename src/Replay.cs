@@ -427,7 +427,7 @@ namespace BrawlhallaReplayReader
 		///<summary>Creates a new instance of <c>GameSettingsType</c>.</summary>
 		internal GameSettingsType(BitStream data)
 		{
-			Flags = new((uint)data.ReadInt());
+			Flags = (GameModeFlags)data.ReadInt();
 			MaxPlayers = (uint)data.ReadInt();
 			Duration = (uint)data.ReadInt();
 			RoundDuration = (uint)data.ReadInt();
@@ -453,66 +453,42 @@ namespace BrawlhallaReplayReader
 		public string ToJson() => JsonSerializer.Serialize(this, Utils.s_json_serializer_options).Replace("  ", "\t");
 	}
 
-	///<summary>Struct <c>GameModeFlags</c> stores information about the game mode flags used during a match.</summary>
-	public readonly struct GameModeFlags
+	///<summary>Enumeration <c>GameModeFlags</c> stores information about the game mode flags used during a match.</summary>
+	[Flags] public enum GameModeFlags
 	{
 		///<value>Whether teams are enabled.</value>
-		public bool Teams { get; private init; }
+		Teams = 1 << 0,
 
 		///<value>Whether team damage is enabled.</value>
-		public bool TeamDamage { get; private init; }
+		TeamDamage = 1 << 1,
 
 		///<value>Whether the camera is fixed.</value>
-		public bool FixedCamera { get; private init; }
+		FixedCamera = 1 << 2,
 
 		///<value>Whether gadgets are disabled.</value>
-		public bool GadgetsOff { get; private init; }
+		GadgetsOff = 1 << 3,
 
 		///<value>Whether weapons are disabled.</value>
-		public bool WeaponsOff { get; private init; }
+		WeaponsOff = 1 << 4,
 
 		///<value>Whether test Levels are enabled.</value>
-		public bool TestLevelsOn { get; private init; }
+		TestLevelsOn = 1 << 5,
 
 		///<value>Whether Test Features are enabled.</value>
-		public bool TestFeaturesOn { get; private init; }
+		TestFeaturesOn = 1 << 6,
 
 		///<value>Whether Ghost Rule is enabled.</value>
-		public bool GhostRule { get; private init; }
+		GhostRule = 1 << 7,
 
 		///<value>Whether seasonal map decorations are disabled.</value>
-		public bool TurnOffMapArtThemes { get; private init; }
+		TurnOffMapArtThemes = 1 << 8,
 
 		///<value>Whether Crew Battle is enabled.</value>
-		public bool ForceCrewBattleCycle { get; private init; }
+		ForceCrewBattleCycle = 1 << 9,
 
 		///<value>Whether Advanced Settings are enabled.</value>
 		///<remarks>Advanced Settings are not implemented in the live game.</remarks>
-		public bool AdvancedSettings { get; private init; }
-
-		///<summary>Creates a new instance of <c>GameModeFlags</c>.</summary>
-		internal GameModeFlags(uint flags)
-		{
-			Teams = (flags & 0b0000000001) != 0;
-			TeamDamage = (flags & 0b0000000010) != 0;
-			FixedCamera = (flags & 0b00000000100) != 0;
-			GadgetsOff = (flags & 0b00000001000) != 0;
-			WeaponsOff = (flags & 0b00000010000) != 0;
-			TestLevelsOn = (flags & 0b00000100000) != 0;
-			TestFeaturesOn = (flags & 0b00001000000) != 0;
-			GhostRule = (flags & 0b00010000000) != 0;
-			TurnOffMapArtThemes = (flags & 0b00100000000) != 0;
-			ForceCrewBattleCycle = (flags & 0b01000000000) != 0;
-			AdvancedSettings = (flags & 0b10000000000) != 0;
-		}
-
-		///<summary>Converts the <c>GameModeFlags</c> to a string.</summary>
-		///<returns>String representation of the <c>GameModeFlags</c>.</returns>
-		public override string ToString() => $"Teams: {Teams}, Team Damage: {TeamDamage}, Fixed Camera: {FixedCamera}, Gadgets Off: {GadgetsOff}, Weapons Off: {WeaponsOff}, Test Levels On: {TestLevelsOn}, Test Features On: {TestFeaturesOn}, Ghost Rule: {GhostRule}, Turn Off Map Art Themes: {TurnOffMapArtThemes}, Force Crew Battle Cycle: {ForceCrewBattleCycle}, Advanced Settings: {AdvancedSettings}";
-
-		///<summary>Converts the <c>GameModeFlags</c> to a JSON string.</summary>
-		///<returns>JSON string representation of the <c>GameModeFlags</c>.</returns>
-		public string ToJson() => JsonSerializer.Serialize(this, Utils.s_json_serializer_options).Replace("  ", "\t");
+		AdvancedSettings = 1 << 10
 	}
 
 	///<summary>Enumeration <c>VariationType</c> stores the gamemode variation used during a match.</summary>
