@@ -418,10 +418,11 @@ namespace BrawlhallaReplayReader
 		public uint GadgetSpawnRateID { get; private init; }
 
 		///<value>Custom Gadgets field</value>
-		public CustomGadgetsType CustomGadgetsField { get; private init; }
+		///<remarks>A bit value of <c>1</c> means the gadget is disabled.</remarks>
+		public uint CustomGadgetsField { get; private init; }
 
-		///<value>Variation field</value>
-		public uint Variation { get; private init; }
+		///<value>Gamemode Variation</value>
+		public VariationType Variation { get; private init; }
 
 		///<summary>Creates a new instance of <c>GameSettingsType</c>.</summary>
 		internal GameSettingsType(BitStream data)
@@ -439,8 +440,8 @@ namespace BrawlhallaReplayReader
 			ItemSpawnRuleSetID = (uint)data.ReadInt();
 			WeaponSpawnRateID = (uint)data.ReadInt();
 			GadgetSpawnRateID = (uint)data.ReadInt();
-			CustomGadgetsField = new((uint)data.ReadInt());
-			Variation = (uint)data.ReadInt();
+			CustomGadgetsField = (uint)data.ReadInt();
+			Variation = (VariationType)data.ReadInt();
 		}
 
 		///<summary>Converts the <c>GameSettingsType</c> to a string.</summary>
@@ -514,49 +515,20 @@ namespace BrawlhallaReplayReader
 		public string ToJson() => JsonSerializer.Serialize(this, Utils.s_json_serializer_options).Replace("  ", "\t");
 	}
 
-	///<summary>Struct <c>CustomGadgetsType</c> stores information about custom Gadgets.</summary>
-	public readonly struct CustomGadgetsType
+	///<summary>Enumeration <c>VariationType</c> stores the gamemode variation used during a match.</summary>
+	public enum VariationType
 	{
-		///<value>Whether Bouncy Bombs are enabled.</value>
-		public bool BouncyBombs { get; private init; }
+		///<value>No variation.</value>
+		None = 0,
 
-		///<value>Whether Pressure Mines are enabled.</value>
-		public bool PressureMines { get; private init; }
+		///<value>Strikeout variation.</value>
+		Strikeout = 1,
 
-		///<value>Whether Spikeballs are enabled.</value>
-		public bool Spikeballs { get; private init; }
+		///<value>Switchcraft variation.</value>
+		Switchcraft = 2,
 
-		///<value>Whether Sidekick Summoners are enabled.</value>
-		public bool SidekickSummoners { get; private init; }
-
-		///<value>Whether Homing Boomerangs are enabled.</value>
-		public bool HomingBoomerangs { get; private init; }
-
-		///<value>Whether Sticky Bombs are enabled.</value>
-		public bool StickyBombs { get; private init; }
-
-		///<value>Whether Weapon Crates are enabled.</value>
-		public bool WeaponCrates { get; private init; }
-
-		///<summary>Creates a new instance of <c>CustomGadgetsType</c>.</summary>
-		internal CustomGadgetsType(uint custom_gadgets)
-		{
-			BouncyBombs = (custom_gadgets & 0b0000001) == 0;
-			PressureMines = (custom_gadgets & 0b0000010) == 0;
-			Spikeballs = (custom_gadgets & 0b0000100) == 0;
-			SidekickSummoners = (custom_gadgets & 0b0001000) == 0;
-			HomingBoomerangs = (custom_gadgets & 0b0010000) == 0;
-			StickyBombs = (custom_gadgets & 0b0100000) == 0;
-			WeaponCrates = (custom_gadgets & 0b1000000) == 0;
-		}
-
-		///<summary>Converts the <c>CustomGadgetsType</c> to a string.</summary>
-		///<returns>String representation of the <c>CustomGadgetsType</c>.</returns>
-		public override string ToString() => $"Bouncy Bombs: {BouncyBombs}, Pressure Mines: {PressureMines}, Spikeballs: {Spikeballs}, Sidekick Summoners: {SidekickSummoners}, Homing Boomerangs: {HomingBoomerangs}, Sticky Bombs: {StickyBombs}, Weapon Crates: {WeaponCrates}";
-
-		///<summary>Converts the <c>CustomGadgetsType</c> to a JSON string.</summary>
-		///<returns>JSON string representation of the <c>CustomGadgetsType</c>.</returns>
-		public string ToJson() => JsonSerializer.Serialize(this, Utils.s_json_serializer_options).Replace("  ", "\t");
+		///<value>Morph variation.</value>
+		Morph = 3
 	}
 
 	///<summary>Struct <c>EntityType</c> stores information about an entity during a match.</summary>
