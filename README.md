@@ -1,5 +1,5 @@
 A basic .replay reader for Brawlhalla.
-Uses the 8.07 replay format (post GameModeManager update).
+Uses the 9.01 replay format (post CompanionID update).
 
 ## Usage
 ```sh
