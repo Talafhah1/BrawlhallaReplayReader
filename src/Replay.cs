@@ -6,7 +6,7 @@ namespace BrawlhallaReplayReader
 {
 	///<summary>Class <c>Replay</c> reads a Brawlhalla replay file.</summary>
 	///<remarks>
-	///<para>This will not work with replays with a version lower than <c>236</c> (game version <c>8.07</c>).<br/>
+	///<para>This will not work with replays with a version lower than <c>246</c> (game version <c>9.01</c>).<br/>
 	///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 	///</remarks>
 	public class Replay
@@ -89,7 +89,7 @@ namespace BrawlhallaReplayReader
 		///<exception cref="ReplayChecksumException">Thrown when the calculated checksum does not match the replay's checksum stored in the header.</exception>
 		///<exception cref="InvalidReplayDataException"> thrown when the replay's data is invalid.</exception>
 		///<remarks>
-		///<para>This will not work with replays with a version lower than <c>236</c>.<br/>
+		///<para>This will not work with replays with a version lower than <c>246</c>.<br/>
 		///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 		///</remarks>
 		public Replay(Stream stream, bool ignore_checksum = false)
@@ -253,6 +253,9 @@ namespace BrawlhallaReplayReader
 		///<value>The player's Sidekick (SpawnBot) ID.</value>
 		public uint SpawnBotID { get; private init; }
 
+		///<value>The player's Companion ID.</value>
+		public uint CompanionID { get; private init; }
+
 		///<value>The player's KO Effect (Emitter) ID.</value>
 		public uint EmitterID { get; private init; }
 
@@ -310,6 +313,7 @@ namespace BrawlhallaReplayReader
 		{
 			ColorSchemeID = (uint)data.ReadInt();
 			SpawnBotID = (uint)data.ReadInt();
+			CompanionID = (uint)data.ReadInt();
 			EmitterID = (uint)data.ReadInt();
 			PlayerThemeID = (uint)data.ReadInt();
 			for (byte i = 0; i < 8; i++) Taunts[i] = (uint)data.ReadInt();
