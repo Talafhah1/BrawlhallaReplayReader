@@ -6,7 +6,7 @@ namespace BrawlhallaReplayReader
 {
 	///<summary>Class <c>Replay</c> reads a Brawlhalla replay file.</summary>
 	///<remarks>
-	///<para>This will not work with replays with a version lower than <c>256</c> (game version <c>9.11</c>).<br/>
+	///<para>This will not work with replays with a version lower than <c>268</c> (game version <c>10.09</c>).<br/>
 	///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 	///</remarks>
 	public class Replay
@@ -89,7 +89,7 @@ namespace BrawlhallaReplayReader
 		///<exception cref="ReplayChecksumException">Thrown when the calculated checksum does not match the replay's checksum stored in the header.</exception>
 		///<exception cref="InvalidReplayDataException"> thrown when the replay's data is invalid.</exception>
 		///<remarks>
-		///<para>This will not work with replays with a version lower than <c>246</c>.<br/>
+		///<para>This will not work with replays with a version lower than <c>268</c>.<br/>
 		///Based on <a href="https://github.com/itselectroz/brawlhalla-replay-reader/">brawlhalla-replay-reader</a> by itselectroz.</para>
 		///</remarks>
 		public Replay(Stream stream, bool ignore_checksum = false)
@@ -154,7 +154,7 @@ namespace BrawlhallaReplayReader
 			LevelID = (uint)m_data!.ReadInt();
 			HeroCount = (ushort)m_data.ReadShort();
 			if (HeroCount == 0 || HeroCount > 5) throw new InvalidReplayDataException("Invalid HeroCount; must be between 1 and 5.");
-			while (m_data.ReadBool()) m_entities.Add(new EntityType(m_data.ReadInt(), m_data.ReadString(), new PlayerType(m_data, HeroCount)));
+			while (m_data.ReadBool()) m_entities.Add(new EntityType(m_data.ReadInt(), m_data.ReadInt(), m_data.ReadString(), new PlayerType(m_data, HeroCount)));
 			if (m_entities.Count == 0) throw new InvalidReplayDataException("No entities found in the replay.");
 			Checksum = (uint)m_data.ReadInt();
 		}
@@ -518,6 +518,9 @@ namespace BrawlhallaReplayReader
 		///<value>The entity's ID.</value>
 		public int EntityID { get; private init; }
 
+		///<value>The player's ID.</value>
+		public int PlayerID { get; private init; }
+
 		///<value>The entity's name.</value>
 		public string Name { get; private init; }
 
@@ -525,16 +528,17 @@ namespace BrawlhallaReplayReader
 		public PlayerType Player { get; private init; }
 
 		///<summary>Creates a new instance of <c>EntityType</c>.</summary>
-		internal EntityType(int id, string name, PlayerType player_type)
+		internal EntityType(int id, int playerId, string name, PlayerType player_type)
 		{
 			EntityID = id;
+			PlayerID = playerId;
 			Name = name;
 			Player = player_type;
 		}
 
 		///<summary>Converts the <c>EntityType</c> to a string.</summary>
 		///<returns>String representation of the <c>EntityType</c>.</returns>
-		public override string ToString() => $"Entity {EntityID} ({Name}) is controlled by player: {Player}.";
+		public override string ToString() => $"Entity {EntityID} ({PlayerID}, {Name}) is controlled by player: {Player}.";
 
 		///<summary>Converts the <c>EntityType</c> to a JSON string.</summary>
 		///<returns>JSON string representation of the <c>EntityType</c>.</returns>
